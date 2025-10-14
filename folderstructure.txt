@@ -1,0 +1,33 @@
+src/
+│
+├─ api/                  # Mock API or query hooks
+│   └─ useStocks.ts
+│
+├─ components/           # Reusable UI components
+│   ├─ Table/
+│   │   ├─ PortfolioTable.tsx
+│   │   └─ TableRow.tsx
+│   ├─ Chart/
+│   │   ├─ LineChart.tsx
+│   │   └─ ColumnChart.tsx
+│   ├─ Modal/
+│   │   ├─ AddStockModal.tsx
+│   │   └─ EditStockModal.tsx
+│   └─ Form/
+│       └─ StockForm.tsx
+│
+├─ store/                # Zustand store
+│   └─ portfolioStore.ts
+│
+├─ types/                # TypeScript types
+│   └─ stock.ts
+│
+├─ pages/                # Page-level components
+│   ├─ Portfolio.tsx
+│   └─ Dashboard.tsx
+│
+├─ utils/                # Helpers (formatting, calculations)
+│   └─ stockUtils.ts
+│
+├─ App.tsx
+└─ main.tsx
