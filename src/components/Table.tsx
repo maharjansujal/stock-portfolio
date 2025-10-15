@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -9,18 +8,11 @@ import { usePortfolioStore } from "../store/portfolioStore";
 import type { Stock } from "../types/stock";
 
 export default function StockTable() {
-  // 1️⃣ Zustand state
   const { stocks, deleteStock } = usePortfolioStore((state) => ({
     stocks: state.stocks,
     deleteStock: state.deleteStock,
   }));
 
-  // 2️⃣ Persist to localStorage whenever stocks change
-  useEffect(() => {
-    localStorage.setItem("portfolio", JSON.stringify(stocks));
-  }, [stocks]);
-
-  // 3️⃣ Define table columns
   const columns: ColumnDef<Stock>[] = [
     { accessorKey: "id", header: "ID" },
     { accessorKey: "ticker", header: "Ticker" },
@@ -43,14 +35,12 @@ export default function StockTable() {
     },
   ];
 
-  // 4️⃣ Create table instance
   const table = useReactTable({
-    data: stocks,
+    data: stocks ?? [],
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
 
-  // 5️⃣ Render table
   return (
     <table className="table-auto border border-gray-300 w-full">
       <thead className="bg-gray-100">
