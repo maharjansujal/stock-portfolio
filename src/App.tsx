@@ -1,56 +1,78 @@
 import "./App.css";
 import { useState } from "react";
 import { usePortfolioStore } from "./store/portfolioStore";
+import type { Stock } from "./types/stock";
 
 function App() {
   const { stocks, addStock, updateStock, deleteStock } = usePortfolioStore();
 
-  // Local state for Add/ Edit forms
-  const [newTicker, setNewTicker] = useState("");
-  const [newCompany, setNewCompany] = useState("");
-  const [newQuantity, setNewQuantity] = useState(1);
-  const [newPurchasePrice, setNewPurchasePrice] = useState(1);
-  const [newCurrentPrice, setNewCurrentPrice] = useState(1);
-  const [newPurchaseDate, setNewPurchaseDate] = useState("");
+  // Shared state for both Add and Edit forms
+  const [formData, setFormData] = useState({
+    ticker: "",
+    companyName: "",
+    quantity: 1,
+    purchasePrice: 1,
+    currentPrice: 1,
+    purchaseDate: "",
+  });
   const [editId, setEditId] = useState<string | null>(null);
-  const [editTicker, setEditTicker] = useState("");
-  const [editCompany, setEditCompany] = useState("");
-  const [editQuantity, setEditQuantity] = useState(1);
-  const [editPurchasePrice, setEditPurchasePrice] = useState(1);
-  const [editCurrentPrice, setEditCurrentPrice] = useState(1);
-  const [editPurchaseDate, setEditPurchaseDate] = useState("");
 
-  //Add stock
+  // Update form data based on input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Handle Add Stock
   function handleAdd() {
-    if (!newTicker || !newCompany) return;
+    if (!formData.ticker || !formData.companyName) return;
     addStock({
       id: Date.now().toString(),
-      ticker: newTicker,
-      companyName: newCompany,
-      quantity: newQuantity,
-      purchasePrice: newPurchasePrice,
-      currentPrice: newCurrentPrice,
-      purchaseDate: newPurchaseDate || new Date().toISOString().split("T")[0],
+      ticker: formData.ticker,
+      companyName: formData.companyName,
+      quantity: formData.quantity,
+      purchasePrice: formData.purchasePrice,
+      currentPrice: formData.currentPrice,
+      purchaseDate:
+        formData.purchaseDate || new Date().toISOString().split("T")[0],
     });
-    setNewTicker("");
-    setNewCompany("");
+    setFormData({
+      ticker: "",
+      companyName: "",
+      quantity: 1,
+      purchasePrice: 1,
+      currentPrice: 1,
+      purchaseDate: "",
+    });
   }
 
-  //Edit Stock
+  // Handle Edit Stock
   function handleEdit() {
     if (!editId) return;
-    updateStock(editId, {
-      ticker: editTicker,
-      companyName: editCompany,
-      quantity: editQuantity,
-      purchasePrice: editPurchasePrice,
-      currentPrice: editCurrentPrice,
-      purchaseDate: editPurchaseDate,
-    });
+    updateStock(editId, formData);
     setEditId(null);
-    setEditTicker("");
-    setEditCompany("");
+    setFormData({
+      ticker: "",
+      companyName: "",
+      quantity: 1,
+      purchasePrice: 1,
+      currentPrice: 1,
+      purchaseDate: "",
+    });
   }
+
+  const handleEditClick = (stock: Stock) => {
+    setEditId(stock.id);
+    setFormData({
+      ticker: stock.ticker,
+      companyName: stock.companyName,
+      quantity: stock.quantity,
+      purchasePrice: stock.purchasePrice,
+      currentPrice: stock.currentPrice,
+      purchaseDate: stock.purchaseDate,
+    });
+  };
+
   return (
     <div className="p-4">
       <h1>My Stocks</h1>
@@ -61,101 +83,57 @@ function App() {
             Purchase: {stock.purchasePrice} | Current: {stock.currentPrice} |
             Date: {stock.purchaseDate}
             <button onClick={() => deleteStock(stock.id)}>Delete</button>
-            <button
-              onClick={() => {
-                setEditId(stock.id);
-                setEditTicker(stock.ticker);
-                setEditCompany(stock.companyName);
-                setEditQuantity(stock.quantity);
-                setEditPurchasePrice(stock.purchasePrice);
-                setEditCurrentPrice(stock.currentPrice);
-                setEditPurchaseDate(stock.purchaseDate);
-              }}
-            >
-              Edit
-            </button>
+            <button onClick={() => handleEditClick(stock)}>Edit</button>
           </li>
         ))}
       </ul>
 
       <hr />
 
-      <h2>Add Stock</h2>
+      <h2>{editId ? "Edit Stock" : "Add Stock"}</h2>
       <input
+        name="ticker"
         placeholder="Ticker"
-        value={newTicker}
-        onChange={(e) => setNewTicker(e.target.value)}
+        value={formData.ticker}
+        onChange={handleInputChange}
       />
       <input
+        name="companyName"
         placeholder="Company Name"
-        value={newCompany}
-        onChange={(e) => setNewCompany(e.target.value)}
+        value={formData.companyName}
+        onChange={handleInputChange}
       />
       <input
+        name="quantity"
         type="number"
         placeholder="Quantity"
-        value={newQuantity}
-        onChange={(e) => setNewQuantity(Number(e.target.value))}
+        value={formData.quantity}
+        onChange={handleInputChange}
       />
       <input
+        name="purchasePrice"
         type="number"
         placeholder="Purchase Price"
-        value={newPurchasePrice}
-        onChange={(e) => setNewPurchasePrice(Number(e.target.value))}
+        value={formData.purchasePrice}
+        onChange={handleInputChange}
       />
       <input
+        name="currentPrice"
         type="number"
         placeholder="Current Price"
-        value={newCurrentPrice}
-        onChange={(e) => setNewCurrentPrice(Number(e.target.value))}
+        value={formData.currentPrice}
+        onChange={handleInputChange}
       />
       <input
+        name="purchaseDate"
         type="date"
         placeholder="Purchase Date"
-        value={newPurchaseDate}
-        onChange={(e) => setNewPurchaseDate(e.target.value)}
+        value={formData.purchaseDate}
+        onChange={handleInputChange}
       />
-      <button onClick={handleAdd}>Add</button>
-
-      {editId && (
-        <>
-          <h2>Edit Stock</h2>
-          <input
-            placeholder="Ticker"
-            value={editTicker}
-            onChange={(e) => setEditTicker(e.target.value)}
-          />
-          <input
-            placeholder="Company Name"
-            value={editCompany}
-            onChange={(e) => setEditCompany(e.target.value)}
-          />
-          <input
-            type="number"
-            placeholder="Quantity"
-            value={editQuantity}
-            onChange={(e) => setEditQuantity(Number(e.target.value))}
-          />
-          <input
-            type="number"
-            placeholder="Purchase Price"
-            value={editPurchasePrice}
-            onChange={(e) => setEditPurchasePrice(Number(e.target.value))}
-          />
-          <input
-            type="number"
-            placeholder="Current Price"
-            value={editCurrentPrice}
-            onChange={(e) => setEditCurrentPrice(Number(e.target.value))}
-          />
-          <input
-            placeholder="Purchase Date"
-            value={editPurchaseDate}
-            onChange={(e) => setEditPurchaseDate(e.target.value)}
-          />
-          <button onClick={handleEdit}>Update</button>
-        </>
-      )}
+      <button onClick={editId ? handleEdit : handleAdd}>
+        {editId ? "Update" : "Add"}
+      </button>
     </div>
   );
 }
