@@ -4,7 +4,8 @@ import { Button } from "@mui/material";
 import { usePortfolioStore } from "./store/portfolioStore";
 import type { Stock } from "./types/stock";
 import FormModal from "./components/FormModal";
-import StockTable from "./components/Table"; // Your TanStack Table
+import StockTable from "./components/Table";
+import PortfolioChart from "./components/PortfolioChart";
 
 function App() {
   const { stocks, addStock, updateStock, deleteStock } = usePortfolioStore();
@@ -37,12 +38,12 @@ function App() {
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">
       <header className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">📊 My Stock Portfolio</h1>
+        <h1 className="text-2xl font-bold">Stock Portfolio</h1>
         <Button variant="contained" color="primary" onClick={handleAddClick}>
           Add Stock
         </Button>
       </header>
-
+      <PortfolioChart />
       <section>
         <StockTable
           stocks={stocks}
